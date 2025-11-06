@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
+require("dotenv").config();
 
 const app = express()
 
@@ -26,11 +27,21 @@ const stafflist = [{
     "contact": "1234567890"
 }]
 
-mongoose.connect("mongodb://127.0.0.1:27017/office").then(function () {
-    console.log("Database connected...")
-}).catch(function () {
-    console.log("Datbase connected failed")
+
+const mongoURI = process.env.MONGO_URI;
+console.log("Connecting to MongoDB:", mongoURI?.slice(0, 25)); // debug line
+
+mongoose.connect(mongoURI, {
+  serverSelectionTimeoutMS: 5000,
 })
+  .then(() => console.log("✅ MongoDB Atlas Connected Successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    if (err.message.includes("ENOTFOUND")) {
+      console.log("⚠️ Check your internet, cluster hostname, or try non-SRV string.");
+    }
+  });
+
 
 const Staff = mongoose.model("Staff",
     {
@@ -38,101 +49,136 @@ const Staff = mongoose.model("Staff",
         name: { type: String, required: true },
         email: { type: String, required: true },
         contact: { type: Number, required: true },
-    }, "stafflist")
+    }, "staff")
 
 
 
-app.get('/staff', function (req, res) {
-
-    Staff.find().then(
-        function (data) {
-            console.log(data)
-            res.send(data)
-        })
-        .catch(function () {
-            console.log("Error")
-        })
-})
-
-app.post("/staff", function (req, res) {
-
-    var newstaff = req.body
-
-    const newStaff = new Staff(
-        {
-            id: newstaff.id,
-            name: newstaff.name,
-            email: newstaff.email,
-            contact: newstaff.contact
-        }
-    )
-    newStaff.save().then(function (data) {
-        console.log("Saved Successfully " + data)
-        res.send(data)
+app.get('/api/staff', function (req, res) {
+  Staff.find()
+    .then(function (data) {
+      console.log(data)
+      res.json(data)
     })
-        .catch(function (err) {
-            console.log(err)
-        })
-
-})
-
-app.get('/read/:id', function (req, res) {
-
-    const Id = parseInt(req.params.id)
-
-    Staff.findOne({ id: Id }).then(
-        function (data) {
-            if (data) {
-                console.log(data)
-                res.send(data)
-            } else {
-                res.send("Staff not found")
-            }
-
-        })
-        .catch(function () {
-            console.log("Error")
-        })
-})
-
-
-app.put("/update/:id", function (req, res) {
-   const Id = parseInt(req.params.id);
-    const { name, email, contact } = req.body
-
-    Staff.findOneAndUpdate(
-        { id: Id },
-        { name, email, contact },
-        { new: true }
-
-    ).then(function(data){
-console.log("updated "+ data)
-res.send(data)
-    })
-    .catch(function(err){
-        console.log(err)
-    })
-
-})
-
-app.delete('/delete/:id',function(req,res)
-{
-    const Id = parseInt(req.params.id)
-
-    Staff.findOneAndDelete({ id: Id })
-    .then(function(data){
-        if(data){
-  console.log("Deleted Staff "+data)
-        res.send(data)
-        }else{
-            console.log("Staff not found")
-        }
-      })
-      .catch(function(err)
-    {
-        console.log("Deleted Staff "+ err)
+    .catch(function (err) {
+      console.error("Error fetching staff:", err)
+      res.status(500).json({ error: 'Server error' })
     })
 })
+
+
+app.post('/api/staff', function (req, res) {
+  var newstaff = req.body
+
+  const newStaff = new Staff({
+    id: newstaff.id,
+    name: newstaff.name,
+    email: newstaff.email,
+    contact: newstaff.contact
+  })
+
+  newStaff.save()
+    .then(function (data) {
+      console.log("Saved Successfully", data)
+      res.status(201).json(data)
+    })
+    .catch(function (err) {
+      console.error("Save failed:", err)
+      res.status(500).json({ error: 'Save failed' })
+    })
+})
+
+
+app.get('/api/staff/:id', async function (req, res) {
+  const id = req.params.id;
+  try {
+    
+    let doc = null;
+    try {
+      doc = await Staff.findById(id);
+    } catch (e) {
+   
+    }
+
+   
+    if (!doc) {
+      const numericId = parseInt(id, 10);
+      if (!Number.isNaN(numericId)) {
+        doc = await Staff.findOne({ id: numericId });
+      }
+    }
+
+    if (!doc) return res.status(404).json({ error: 'Staff not found' });
+    return res.json(doc);
+  } catch (err) {
+    console.error('Read single staff failed:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
+
+app.put('/api/staff/:id', async function (req, res) {
+  const id = req.params.id;
+  const { name, email, contact } = req.body;
+
+  try {
+  
+    let updated = null;
+    try {
+      updated = await Staff.findByIdAndUpdate(id, { name, email, contact }, { new: true });
+    } catch (e) {
+     
+    }
+
+    if (!updated) {
+      const numericId = parseInt(id, 10);
+      if (!Number.isNaN(numericId)) {
+        updated = await Staff.findOneAndUpdate({ id: numericId }, { name, email, contact }, { new: true });
+      }
+    }
+
+    if (!updated) return res.status(404).json({ error: 'Staff not found' });
+    return res.json(updated);
+  } catch (err) {
+    console.error('Update failed:', err);
+    return res.status(500).json({ error: 'Update failed' });
+  }
+});
+
+
+// DELETE 
+app.delete('/api/staff/:id', async function (req, res) {
+  const id = req.params.id;
+
+  try {
+   
+    const deleted = await Staff.findByIdAndDelete(id);
+
+    if (deleted) {
+      console.log('Deleted Staff', deleted);
+      return res.json(deleted);
+    }
+
+  
+    const numericId = parseInt(id, 10);
+    if (!Number.isNaN(numericId)) {
+      const deletedByNumeric = await Staff.findOneAndDelete({ id: numericId });
+      if (deletedByNumeric) {
+        console.log('Deleted Staff by numeric id', deletedByNumeric);
+        return res.json(deletedByNumeric);
+      }
+    }
+
+   
+    res.status(404).json({ error: 'Staff not found' });
+  } catch (err) {
+    console.error('Delete failed:', err);
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
+
 
 app.listen(5000, function () {
     console.log("Server Started...")

@@ -18,33 +18,33 @@ const Update = () => {
   })
 
   useEffect(function () {
-    axios.get("http://localhost:5000/read/" + id)
-      .then(function (res) {
-        console.log(res)
-        setvalues({
-        id: res.data.id,
-        name: res.data.name,
-        email: res.data.email,
-        contact: res.data.contact
-      });
-      })
-      .catch(function (err) {
-        console.log(err)
-      })
-  }, [])
+   axios.get(`http://localhost:5000/api/staff/${id}`)
+  .then(function (res) {
+    console.log('GET staff:', res.data);
+    setvalues({
+      id: res.data._id ?? res.data.id,
+      name: res.data.name,
+      email: res.data.email,
+      contact: res.data.contact
+    });
+  })
+  .catch(function (err) {
+    console.error('Load failed:', err);
+  });
+  }, [id])
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.put('http://localhost:5000/update/' + id, values)
-      .then(function (data) {
-        alert("Staff updated successfully");
-        console.log(data)
-        navigate('/')
-      })
-      .catch(function (err) {
-        console.log("Update failed:", err)
-      })
+    axios.put(`http://localhost:5000/api/staff/${id}`, values)
+  .then(function (res) {
+    alert("Staff updated successfully");
+    console.log(res.data);
+  })
+  .catch(function (err) {
+    console.error("Update failed:", err);
+    alert("Update failed. Check console for details.");
+  });
   }
 
 
@@ -76,13 +76,13 @@ const Update = () => {
                   placeholder="Enter Name"
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={values.name}
-                  onChange={e => setvalues({ ...values, name:e.target.value })} />
+                  onChange={e => setvalues({ ...values, name: e.target.value })} />
               </div>
 
               <div className="mb-4">
                 <label className="block text-gray-700 mb-1" htmlFor="email">Email</label>
                 <input
-                 
+
                   type="email"
                   placeholder="Enter Email"
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -92,7 +92,7 @@ const Update = () => {
               <div className="mb-4">
                 <label className="block text-gray-700 mb-1" htmlFor="Contact">Contact</label>
                 <input
-                
+
                   type="number"
                   placeholder="Enter contact"
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"

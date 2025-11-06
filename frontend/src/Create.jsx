@@ -17,7 +17,7 @@ const Create = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.post('http://localhost:5000/staff', values)
+    axios.post('http://localhost:5000/api/staff', values)
       .then(function (data) {
         alert("Staff added successfully");
         console.log(data)

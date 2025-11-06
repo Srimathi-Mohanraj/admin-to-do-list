@@ -9,7 +9,7 @@ const Read = () => {
     const [staff, setstaff] = useState({})
 
     useEffect(function () {
-        axios.get("http://localhost:5000/read/" + id)
+        axios.get(`http://localhost:5000/api/staff/${id}`)
             .then(function (res) {
                 console.log(res)
                 setstaff(res.data)
@@ -32,7 +32,7 @@ const Read = () => {
                     <h2><strong>Contact:</strong> {staff.contact}</h2>
                     <div className='flex gap-2 mt-5'>
                         <Link to='/' className='bg-blue-400 w-fit rounded px-3 py-1 mx-2'>Back</Link>
-                        <Link to={`/update/${staff.id}`} className='bg-[#00B9F2] w-fit rounded px-3 py-1'>Edit</Link>
+                        <Link to={`/update/${id}`} className='bg-[#00B9F2] w-fit rounded px-3 py-1'>Edit</Link>
 
                     </div>
 
