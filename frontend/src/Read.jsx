@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios from 'axios'
+import { API } from './api'
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -9,7 +10,7 @@ const Read = () => {
     const [staff, setstaff] = useState({})
 
     useEffect(function () {
-        axios.get(`{API}/api/staff/${id}`)
+        axios.get(`${API}/api/staff/${id}`)
             .then(function (res) {
                 console.log(res)
                 setstaff(res.data)

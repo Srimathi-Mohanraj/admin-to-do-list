@@ -1,6 +1,7 @@
 import React from 'react'
 import { useEffect } from 'react'
-import { API } from './api';
+import axios from 'axios'
+import { API } from './api'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
