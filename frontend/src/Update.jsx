@@ -18,7 +18,7 @@ const Update = () => {
   })
 
   useEffect(function () {
-   axios.get(`http://localhost:5000/api/staff/${id}`)
+   axios.get(`${API}/api/staff/${id}`)
   .then(function (res) {
     console.log('GET staff:', res.data);
     setvalues({
@@ -36,7 +36,7 @@ const Update = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.put(`http://localhost:5000/api/staff/${id}`, values)
+    axios.put(`${API}/api/staff/${id}`, updatedStaff)
   .then(function (res) {
     alert("Staff updated successfully");
     console.log(res.data);

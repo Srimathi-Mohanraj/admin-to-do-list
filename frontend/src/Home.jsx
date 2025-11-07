@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect } from 'react'
-import axios from 'axios'
+import { API } from './api';
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -10,7 +10,7 @@ const Home = () => {
   const [data, setdata] = useState([])
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/staff')
+    axios.get(`${API}/api/staff`)
       .then(response => {
         if (Array.isArray(response.data)) {
           setdata(response.data);
@@ -28,7 +28,7 @@ const Home = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this staff?")) {
-      axios.delete(`http://localhost:5000/api/staff/${id}`)
+      axios.delete(`${API}/api/staff/${id}`)
 
         .then(() => {
           alert('Staff deleted successfully');

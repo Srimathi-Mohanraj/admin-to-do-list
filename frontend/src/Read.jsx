@@ -9,7 +9,7 @@ const Read = () => {
     const [staff, setstaff] = useState({})
 
     useEffect(function () {
-        axios.get(`http://localhost:5000/api/staff/${id}`)
+        axios.get(`{API}/api/staff/${id}`)
             .then(function (res) {
                 console.log(res)
                 setstaff(res.data)

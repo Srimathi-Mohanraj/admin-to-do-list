@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { API } from './api';
 import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -17,7 +17,7 @@ const Create = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.post('http://localhost:5000/api/staff', values)
+    axios.post(`${API}/api/staff, newStaff`)
       .then(function (data) {
         alert("Staff added successfully");
         console.log(data)
