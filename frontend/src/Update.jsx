@@ -19,33 +19,41 @@ const Update = () => {
   })
 
   useEffect(function () {
-   axios.get(`${API}/api/staff/${id}`)
-  .then(function (res) {
-    console.log('GET staff:', res.data);
-    setvalues({
-      id: res.data._id ?? res.data.id,
-      name: res.data.name,
-      email: res.data.email,
-      contact: res.data.contact
-    });
-  })
-  .catch(function (err) {
-    console.error('Load failed:', err);
-  });
+    axios.get(`${API}/api/staff/${id}`)
+      .then(function (res) {
+        console.log('GET staff:', res.data);
+        setvalues({
+          id: res.data._id ?? res.data.id,
+          name: res.data.name,
+          email: res.data.email,
+          contact: res.data.contact
+        });
+      })
+      .catch(function (err) {
+        console.error('Load failed:', err);
+      });
   }, [id])
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.put(`${API}/api/staff/${id}`, updatedStaff)
-  .then(function (res) {
-    alert("Staff updated successfully");
-    console.log(res.data);
-  })
-  .catch(function (err) {
-    console.error("Update failed:", err);
-    alert("Update failed. Check console for details.");
-  });
+
+    const payload = {
+      name: values.name,
+      email: values.email,
+      contact: values.contact 
+    };
+
+    axios.put(`${API}/api/staff/${id}`, payload)
+      .then(function (res) {
+        alert("Staff updated successfully");
+        console.log(res.data);
+        navigate('/')
+      })
+      .catch(function (err) {
+        console.error("Update failed:", err);
+        alert("Update failed. Check console for details.");
+      });
   }
 
 
@@ -62,7 +70,7 @@ const Update = () => {
                 <label className="block text-gray-700 mb-1" htmlFor="id">ID</label>
                 <input
 
-                  type="number"
+                  type="text"
                   placeholder="Enter ID"
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={values.id}
